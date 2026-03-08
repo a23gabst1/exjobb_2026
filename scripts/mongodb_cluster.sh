@@ -69,7 +69,7 @@ rs.initiate({
 echo "The replica set for each shard have been initialized"
 
 # Starting up the mongos router service - routes the queries
-docker compose -f docker/docker-compose-mongo-mongos-yaml up -d
+docker compose -f docker/docker-compose-mongo-mongos.yaml up -d
 
 until docker exec mongos mongosh --eval "db.adminCommand('ping')" &> /dev/null; do
     sleep 2
@@ -87,3 +87,28 @@ sh.enableSharding("hospitaldb");
 sh.shardCollection("hospitaldb.patients", {patient_id: "hashed"});
 sh.shardCollection("hospitaldb.images", {patient_id: "hashed"});
 '
+
+echo "Importing data"
+
+uri="mongodb://localhost:30000"
+db="hospitaldb"
+
+# mongoimport is a MongoDB Database Tool (external) used for importing data
+# Imports .json files and many other formats
+# Connects to the mongos
+# Chooses a database (creates it if it does not exist)
+# Chooses which collection it should be loaded into (Same with the database it creates that collection if it does not exist)
+# Lastly --file specifies the location of the data file
+mongoimport \
+--uri "$uri" \
+--db "$db" \
+--collection "patients" \
+--file "$(pwd)/data/patients.json"
+
+mongoimport \
+--uri "$uri" \
+--db "$db" \
+--collection "images" \
+--file "$(pwd)/data/hospital_images.json"
+
+echo "Data has been imported and the cluster is ready"
