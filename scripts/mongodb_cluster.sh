@@ -32,3 +32,38 @@ rs.initiate({
 '
 
 echo "Config server replica set initialized"
+
+# Starting up the shards services
+docker compose -f docker/docker-compose-mongo-shards.yaml up -d
+
+# Same as the config servers - making sure that every service is ready
+for shard in shard1-1 shard1-2 shard2-1 shard2-2; do
+    until docker exec $shard mongosh --eval "db.adminCommand('ping')"; do
+        sleep 2
+    done
+done
+
+echo "The shards are ready"
+
+# Creates a replica set for shard 1
+docker exec shard1-1 mongosh --eval '
+rs.initiate({
+    _id: "shard1_rs",
+    members: [
+        {_id: 0, host: "shard1-1:27017"},
+        {_id: 1, host: "shard1-2:27017"}
+    ]
+});
+'
+
+# Creates the second replica set for shard 2
+docker exec shard2-1 mongosh --eval '
+rs.initiate({
+    _id: "shard2_rs",
+    members: [
+        {_id: 0, host: "shard2-1:27017"},
+        {_id: 1, host: "shard2-2:27017"}
+    ]
+});
+'
+echo "The replica set for each shard have been initialized"
