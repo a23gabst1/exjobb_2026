@@ -67,3 +67,23 @@ rs.initiate({
 });
 '
 echo "The replica set for each shard have been initialized"
+
+# Starting up the mongos router service - routes the queries
+docker compose -f docker/docker-compose-mongo-mongos-yaml up -d
+
+until docker exec mongos mongosh --eval "db.adminCommand('ping')" &> /dev/null; do
+    sleep 2
+done
+
+# The application is going to connect to the mongos which will route the queries instead of connecting to shards
+# Adds two shards 
+# Shards the collections patients and images - uses the patient_id as the shard key
+# It also uses hashing as the strategy to get even distribution
+docker exec mongos mongosh --eval '
+sh.addShard("shard1_rs/shard1-1:27017,shard1-2:27017");
+sh.addShard("shard2_rs/shard2-1:27017,shard2-2:27017");
+db = db.getSiblingDB("hospitaldb");
+sh.enableSharding("hospitaldb");
+sh.shardCollection("hospitaldb.patients", {patient_id: "hashed"});
+sh.shardCollection("hospitaldb.images", {patient_id: "hashed"});
+'
