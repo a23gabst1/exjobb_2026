@@ -25,3 +25,18 @@ do
         "node_count": "4"
     }'
 done
+
+# The other nodes aside from the primary joins the the cluster
+# The request is sent yet again to the primary and it adds another node by connecting it via the host which is the nodename (see docker/docker-compose-couchdb.yaml)
+for NODE_ID in $SECONDARIES
+do 
+    curl -X POST "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_cluster_setup" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "action": "add_node",
+        "host": "'"couchdb-${NODE_ID}.exjobb"'",
+        "port": 5984,
+        "username": "user",
+        "password": "password"
+    }'
+done
