@@ -1,0 +1,78 @@
+services:
+  couchdb0:
+    image: couchdb
+    environment:
+      - COUCHDB_USER=user
+      - COUCHDB_PASSWORD=password
+      - NODENAME=couchdb-0.exjobb
+      - COUCHDB_SECRET=secret
+      - ERL_FLAGS="-setcookie couch_cookie"
+    ports:
+      - 21000:5984
+    networks:
+      couchnet:
+        aliases:
+          - couchdb-0.exjobb
+    volumes:
+      - "config-c-0:/opt/couchdb/etc/local.d"
+
+  couchdb1:
+    image: couchdb
+    environment:
+      - COUCHDB_USER=user
+      - COUCHDB_PASSWORD=password
+      - NODENAME=couchdb-1.exjobb
+      - COUCHDB_SECRET=secret
+      - ERL_FLAGS="-setcookie couch_cookie"
+    ports:
+      - 21001:5984
+    networks:
+      couchnet:
+        aliases:
+          - couchdb-1.exjobb
+    volumes:
+      - "config-c-1:/opt/couchdb/etc/local.d"
+
+  couchdb2:
+    image: couchdb
+    environment:
+      - COUCHDB_USER=user
+      - COUCHDB_PASSWORD=password
+      - NODENAME=couchdb-2.exjobb
+      - COUCHDB_SECRET=secret
+      - ERL_FLAGS="-setcookie couch_cookie"
+    ports:
+      - 21002:5984
+    networks:
+      couchnet:
+        aliases:
+          - couchdb-2.exjobb
+    volumes:
+      - "config-c-2:/opt/couchdb/etc/local.d"
+
+  couchdb3:
+    image: couchdb
+    environment:
+      - COUCHDB_USER=user
+      - COUCHDB_PASSWORD=password
+      - NODENAME=couchdb-3.exjobb
+      - COUCHDB_SECRET=secret
+      - ERL_FLAGS="-setcookie couch_cookie"
+    ports:
+      - 21003:5984
+    networks:
+      couchnet:
+        aliases:
+          - couchdb-3.exjobb
+    volumes:
+      - "config-c-3:/opt/couchdb/etc/local.d"
+
+networks:
+  couchnet:
+
+
+volumes:
+  config-c-0:
+  config-c-1:
+  config-c-2:
+  config-c-3:
