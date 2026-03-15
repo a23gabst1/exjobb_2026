@@ -40,3 +40,17 @@ do
         "password": "password"
     }'
 done
+
+sleep 3 
+
+curl "http://user:password@localhost:${BASE_PORT}${PRIMARY}/"
+
+# It finalizes the cluster by sending it to the primary
+curl -X POST "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_cluster_setup" \
+-H "Content-Type: application/json" \
+-d '{
+    "action": "finish_cluster"
+}'
+
+# Used to observe that the cluster has been finished
+curl "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_cluster_setup"
