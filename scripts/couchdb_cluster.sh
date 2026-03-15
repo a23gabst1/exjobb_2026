@@ -3,6 +3,7 @@
 BASE_PORT="2100"
 PRIMARY="0"
 SECONDARIES="1 2 3"
+DATABASE="hospitaldb"
 
 # Starts up the four instances of couchdb which is going to form a four node cluster
 # Uses a relative path since otherwise docker would not find the compose file
@@ -54,3 +55,15 @@ curl -X POST "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_cluster_set
 
 # Used to observe that the cluster has been finished
 curl "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_cluster_setup"
+
+# Check that every node is connected and knows about each other 
+# If the number of nodes is different between all_nodes and cluster_nodes, then something unexpected happened during the addition of nodes in the cluster
+curl "http://user:password@localhost:${BASE_PORT}${PRIMARY}/_membership"
+
+# Creates a database in with two shards and a replication factor of 2 
+# n = replication
+# q = shards
+curl -X PUT "http://user:password@localhost:${BASE_PORT}${PRIMARY}/hospitaldb?n=2&q=2"
+
+# Checking which node belong to what shard
+curl -s "http://user:password@localhost:${BASE_PORT}${PRIMARY}/${DATABASE}/_shards"
