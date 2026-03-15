@@ -67,3 +67,13 @@ curl -X PUT "http://user:password@localhost:${BASE_PORT}${PRIMARY}/hospitaldb?n=
 
 # Checking which node belong to what shard
 curl -s "http://user:password@localhost:${BASE_PORT}${PRIMARY}/${DATABASE}/_shards"
+
+echo "CURRENT PATH: $(pwd)"
+
+cd ../data
+
+# Using the couchimport package to import to couchdb by first navigating to the folder where the data reside
+# Specify the database, the url and the buffer
+cat ./patients.json | couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000
+
+cat ./hospital_images.json | couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000
