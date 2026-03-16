@@ -55,4 +55,4 @@ app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
 });
 
-export { numOfDocuments, selectedDatabase };
+export { numOfDocuments, selectedDatabase, __dirname };
