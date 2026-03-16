@@ -4,6 +4,7 @@ BASE_PORT="2100"
 PRIMARY="0"
 SECONDARIES="1 2 3"
 DATABASE="hospitaldb"
+IMAGE_COUNT=$1
 
 # Starts up the four instances of couchdb which is going to form a four node cluster
 # Uses a relative path since otherwise docker would not find the compose file
@@ -76,4 +77,17 @@ cd ../data
 # Specify the database, the url and the buffer
 cat ./patients.json | couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000
 
-cat ./hospital_images.json | couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000
+# All this below is Parallel writes 
+
+# Based on the size of the file, it will split the file to 300K or 1M lines for each splitted file
+# Creates files inside the chunks folder 
+# chunk_01, chunk_02, ...
+if [ "$IMAGE_COUNT" -eq 9 ]; then
+    split -l 300000 -d ./hospital_images.json ../chunks/chunk_
+else 
+    split -l 1000000 -d ./hospital_images.json ../chunks/chunk_
+fi
+
+# Find all those chunk files 
+# It spawn two processes at once running couchimport, one for each file
+find ../chunks -type f -iname "chunk_*" | xargs -t -I % -P 2 couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000 %
