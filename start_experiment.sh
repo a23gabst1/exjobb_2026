@@ -14,7 +14,7 @@ chmod +x ./generate_data.sh ./mongodb_cluster.sh ./couchdb_cluster.sh
 
 cd ..
 
-DOC_SIZE=$IMAGE_COUNT node index.js
+DOC_SIZE=$IMAGE_COUNT node server.js
 
 sleep 3
 
