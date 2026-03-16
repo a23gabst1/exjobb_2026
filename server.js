@@ -37,7 +37,7 @@ app.get("/init_experiment", async (req, res) => {
     selectedDatabase = database;
 
     try {
-        const csvHeader = "old,new,delta,patient_id";
+        const csvHeader = "old,new,delta,patient_id\n";
         const resultFolder = "measures";
         const fullPath = path.join(__dirname, resultFolder, `${numOfDocuments}_${selectedDatabase}.csv`);
         await writeFile(fullPath, csvHeader);
