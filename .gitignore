@@ -147,3 +147,5 @@ testing/
 lc25000-extracted/
 images/
 data/*.json
+measures/
+chunks/
