@@ -1,6 +1,7 @@
 import { __dirname, numOfDocuments, selectedDatabase } from "./server.js";
 import path from "node:path";
 import fs from "node:fs"
+import convertHrtime from "convert-hrtime";
 
 // Starts the first timer
 function startTimer() {
@@ -20,7 +21,7 @@ function stopTimer(startTime, patientID) {
 function storeResult(trialData) {
     const { startTime, stopTime, deltaTime, patientID } = trialData;
     const fullPath = path.join(__dirname, "measures", `${numOfDocuments}_${selectedDatabase}.csv`);
-    const csvRow = `${startTime},${stopTime},${deltaTime},${patientID}\n`;
+    const csvRow = `${convertTime(startTime)},${convertTime(stopTime)},${convertTime(deltaTime)},${patientID}\n`;
 
     fs.appendFile(fullPath, csvRow, (error) => {
         if (error) {
@@ -29,6 +30,10 @@ function storeResult(trialData) {
         }
         console.log("Trial data has been appended successfully!");
     });
+}
+
+function convertTime(time) {
+    return convertHrtime(time).milliseconds;
 }
 
 export { startTimer, stopTimer };
