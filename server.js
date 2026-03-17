@@ -21,8 +21,9 @@ let selectedDatabase = null;
 
 // Express middlewares
 app.use(express.json()); // Only parses JSON
-app.use(express.static(path.join(__dirname, "public"))); //Serves static files
+app.use("/public", express.static(path.join(__dirname, "public"))); //Serves static files
 
+// User defined routes - one for each database
 app.use("/mongodb", mongoRouter);
 app.use("/couchdb", couchRouter);
 
