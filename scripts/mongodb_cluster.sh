@@ -79,10 +79,14 @@ done
 # Adds two shards 
 # Shards the collections patients and images - uses the patient_id as the shard key
 # It also uses hashing as the strategy to get even distribution
+# Creates index on two fields to make it a fair comparison between the databases (It was almost required create indexes in CouchDB)
 docker exec mongos mongosh --eval '
 sh.addShard("shard1_rs/shard1-1:27017,shard1-2:27017");
 sh.addShard("shard2_rs/shard2-1:27017,shard2-2:27017");
 db = db.getSiblingDB("hospitaldb");
+db.images.createIndex(
+    {"patient_id": 1, "content_type": 1}
+);
 sh.enableSharding("hospitaldb");
 sh.shardCollection("hospitaldb.patients", {patient_id: "hashed"});
 sh.shardCollection("hospitaldb.images", {patient_id: "hashed"});

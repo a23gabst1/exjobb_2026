@@ -69,6 +69,10 @@ curl -X PUT "http://user:password@localhost:${BASE_PORT}${PRIMARY}/hospitaldb?n=
 # Checking which node belong to what shard
 curl -s "http://user:password@localhost:${BASE_PORT}${PRIMARY}/${DATABASE}/_shards"
 
+# Creates an index on the fields patient_id and content_type
+# Reason: CouchDB proceeds to do a full scan of the database
+curl -X POST "http://user:password@localhost:${BASE_PORT}${PRIMARY}/${DATABASE}/_index" -H "Content-Type: application/json" -d '{"index": {"fields": ["patient_id", "content_type"]},"name": "image_index", "type":"json"}'
+
 echo "CURRENT PATH: $(pwd)"
 
 cd ../data
@@ -90,4 +94,4 @@ fi
 
 # Find all those chunk files 
 # It spawn two processes at once running couchimport, one for each file
-find ../chunks -type f -iname "chunk_*" | xargs -t -I % -P 2 couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000 %
+find ../chunks -type f -iname "chunk_*" | xargs -t -I % -P 2 couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 5000 %
