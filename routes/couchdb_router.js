@@ -3,4 +3,4 @@ import { getPatientImages } from "../handler/couchdb_handler.js";
 
 export const couchRouter = Router();
 
-couchRouter.get("/", getPatientImages);
+couchRouter.get("/:patient_id", getPatientImages);
