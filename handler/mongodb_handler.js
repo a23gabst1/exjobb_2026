@@ -31,6 +31,9 @@ async function getPatientImages(req, res) {
         });
     } catch (error) {
         console.error("Error on MongoDB Handler", error);
+        return res.status(500).json({
+            msg: "Something went wrong"
+        });
     } finally {
         await client.close();
     }
