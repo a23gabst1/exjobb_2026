@@ -24,9 +24,35 @@ body {
         height: inherit;
         width: 100%;
         display: flex;
+        transition: transform .4s ease-in;
     }
 }
 
 .page_step {
     min-width: 100%;
+}
+
+#page_step_0 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .8rem;
+}
+
+.db_btn {
+    min-width: 15rem;
+    aspect-ratio: 1;
+    background-color: #2A2F34;
+    color: #eee;
+    border: none;
+    box-shadow: 0px 8px #181c1f;
+    border-radius: .4rem;
+    font-size: 1.8rem;
+    transition: all .1s ease;
+    cursor: pointer;
+}
+
+.db_btn:active {
+    transform: translateY(6px);
+    box-shadow: 0px 0px #1f2326;
 }
