@@ -49,6 +49,10 @@ app.get("/init_experiment", async (req, res) => {
         });
     } catch (error) {
         console.error("Error when creating the file (init_experiment - endpoint)", error);
+        return res.status(500).json({
+            msg: "Do not start the experiment",
+            start: false
+        });
     }
 });
 

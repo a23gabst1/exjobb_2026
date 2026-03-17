@@ -39,7 +39,7 @@ let experimentTrials = null;
  * 
  * @param {Event} event 
  */
-function handleStartBtnClick(event) {
+async function handleStartBtnClick(event) {
     const trialInput = event.currentTarget.previousElementSibling;
     const numOfTrials = parseInt(trialInput.value.trim());
     if (numOfTrials < 0 || numOfTrials === 0 || trialInput.value === "") {
@@ -48,10 +48,39 @@ function handleStartBtnClick(event) {
     }
 
     experimentTrials = numOfTrials;
+
+    const { msg, start } = await initializeExperiment();
+
+    if (start) {
+        slideToPage(2);
+        // Start sending requests and measuring the time difference
+    }
+}
+
+/**
+ * Function that more or less decide whether the experiment could begin or not
+ * 
+ * @returns An object response which indicate whether to the experiment and start measuring 
+ */
+async function initializeExperiment() {
+    try {
+        const url = `http://localhost:3000/init_experiment?database=${selectedDatabase}`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            return { msg: "Something went wrong!", start: false };
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error when trying to initialize experiment", error);
+    }
 }
 
 startExperimentBtn.addEventListener("click", handleStartBtnClick);
-
-(function () {
-    slideToPage(1);
-})();
