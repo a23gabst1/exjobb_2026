@@ -28,9 +28,11 @@ async function getPatientImages(req, res) {
         const response = await db.find(mangoQuery);
         stopTimer(startTime, patient_id);
 
+        const responseImages = response.docs.slice(0, 9);
+
         return res.status(200).json({
             msg: "Successful read!",
-            images: response.docs
+            images: responseImages
         });
     } catch (error) {
         console.error("Error on couchdb handler", error);

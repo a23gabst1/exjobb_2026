@@ -25,9 +25,11 @@ async function getPatientImages(req, res) {
         const patientImages = await collection.find({ patient_id: patient_id }).toArray();
         stopTimer(startTime, patient_id);
 
+        const responseImages = patientImages.slice(0, 9);
+
         return res.status(200).json({
             msg: "Successful read",
-            images: patientImages
+            images: responseImages
         });
     } catch (error) {
         console.error("Error on MongoDB Handler", error);
