@@ -5,6 +5,7 @@ import path from "node:path"
 import { mongoRouter } from "./routes/mongodb_router.js"
 import { couchRouter } from "./routes/couchdb_router.js"
 import { writeFile } from "node:fs/promises"
+import { execFile } from "node:child_process"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,8 +57,41 @@ app.get("/init_experiment", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
+});
+
+/**
+ * Function that cleans up by closing down the services and the express server
+ * 
+ * @param {string} signal 
+ */
+function cleanUpNExit(signal) {
+    console.log(`Handling signal: ${signal}`);
+    execFile("bash", [path.join(__dirname, "scripts", "destroy_clusters.sh")], (error, stdout, stderr) => {
+        if (error) {
+            console.error("Error", error.message);
+        }
+
+        if (stderr) {
+            console.error("Stderr", stderr);
+        }
+
+        console.log("Output: ", stdout);
+
+        server.close(() => {
+            console.log("Closing down server...");
+            process.exit(0);
+        });
+    });
+}
+
+process.once("SIGINT", () => {
+    cleanUpNExit("SIGINT");
+});
+
+process.once("SIGTERM", () => {
+    cleanUpNExit("SIGTERM");
 });
 
 export { numOfDocuments, selectedDatabase, __dirname };
