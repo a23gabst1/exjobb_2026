@@ -42,6 +42,7 @@ let experimentTrials = null;
 async function handleStartBtnClick(event) {
     const trialInput = event.currentTarget.previousElementSibling;
     const numOfTrials = parseInt(trialInput.value.trim());
+
     if (numOfTrials < 0 || numOfTrials === 0 || trialInput.value === "") {
         alert("Trials cannot be under or equal to 0, or empty!");
         return;
@@ -53,7 +54,9 @@ async function handleStartBtnClick(event) {
 
     if (start) {
         slideToPage(2);
-        // Start sending requests and measuring the time difference
+        setTimeout(async () => {
+            await sendRequest();
+        }, 4000);
     }
 }
 
@@ -84,3 +87,60 @@ async function initializeExperiment() {
 }
 
 startExperimentBtn.addEventListener("click", handleStartBtnClick);
+
+/**
+ * Function that sends requests to the database endpoint chosen for the experiment
+ * 
+ * The function is recursive to simulate multiple calls being made by making it call itself
+ * 
+ * @param {number} currentIteration 
+ */
+async function sendRequest(currentIteration = 0) {
+    /* 
+        Important - Base case to make the recursive function stop to prevent stack overflows
+    */
+    if (currentIteration >= experimentTrials) {
+        alert("Experiment is done!");
+        slideToPage(0);
+        return;
+    }
+
+    Math.setSeed(currentIteration);
+
+    try {
+        const numOfPatients = 100_000;
+        const randomPatient = Math.floor(Math.random() * numOfPatients);
+
+        const database = selectedDatabase.toLowerCase();
+        const patientID = stringPadding(randomPatient);
+
+        const url = `http://localhost:3000/${database}/${patientID}`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        //Views
+
+        setTimeout(async () => {
+            await sendRequest(currentIteration + 1);
+        }, 3000);
+    } catch (error) {
+        console.error(`Error when sending request to '/${database}' endpoint`, error);
+    }
+}
+
+/**
+ * Function that adds a 0 to numbers from 0-9 to make it look like this: 00, 01, .. , 09
+ * 
+ * @param {number} num 
+ * @returns 
+ */
+function stringPadding(num) {
+    return num < 10 ? num.toString().padStart(2, "0") : num.toString();
+}
