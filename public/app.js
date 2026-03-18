@@ -112,7 +112,7 @@ async function sendRequest(currentIteration = 0) {
         const randomPatient = Math.floor(Math.random() * numOfPatients);
 
         const database = selectedDatabase.toLowerCase();
-        const patientID = stringPadding(randomPatient);
+        const patientID = `P${stringPadding(randomPatient)}`;
 
         const url = `http://localhost:3000/${database}/${patientID}`;
 
@@ -125,7 +125,7 @@ async function sendRequest(currentIteration = 0) {
 
         const data = await response.json();
 
-        //Views
+        createView(data, patientID);
 
         setTimeout(async () => {
             await sendRequest(currentIteration + 1);
@@ -143,4 +143,34 @@ async function sendRequest(currentIteration = 0) {
  */
 function stringPadding(num) {
     return num < 10 ? num.toString().padStart(2, "0") : num.toString();
+}
+
+/**
+ * Function that is responsible for creating the view by rendering the patient ID and the images related to the patient
+ * 
+ * @param {Object} data 
+ * @param {string} patientID 
+ */
+function createView(data, patientID) {
+    const { msg, images } = data;
+
+    const patientIDText = document.querySelector(".patient_id_txt");
+    const imageWrapper = document.querySelector(".medic_image_wrapper");
+
+    patientIDText.textContent = patientID;
+
+    imageWrapper.innerHTML = "";
+    const n = images.length;
+    for (let i = 0; i < n; i++) {
+        const img = document.createElement("img");
+
+        /* 
+            Relative Path
+            It is in public since the server sends static assets which include images
+        */
+        img.src = `/public/${images[i].img_src}`;
+        img.alt = "Image of an possible disease";
+
+        imageWrapper.append(img);
+    }
 }

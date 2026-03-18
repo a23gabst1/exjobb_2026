@@ -30,7 +30,7 @@ async function getPatientImages(req, res) {
 
         return res.status(200).json({
             msg: "Successful read!",
-            documents: response.docs
+            images: response.docs
         });
     } catch (error) {
         console.error("Error on couchdb handler", error);
