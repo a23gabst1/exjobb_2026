@@ -57,6 +57,26 @@ app.get("/init_experiment", async (req, res) => {
     }
 });
 
+/**
+ * Server sent events - informs the user which database could only be measured and evaluated on the web interface
+ */
+app.get("/db_events", (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    });
+
+    const intervalID = setInterval(() => {
+        res.write(`data: DB ${process.env.DB}\n\n`);
+    }, 100);
+
+    req.on("close", () => {
+        clearInterval(intervalID);
+        res.end();
+    });
+});
+
 const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
 });
@@ -68,7 +88,7 @@ const server = app.listen(PORT, () => {
  */
 function cleanUpNExit(signal) {
     console.log(`Handling signal: ${signal}`);
-    execFile("bash", [path.join(__dirname, "scripts", "destroy_clusters.sh")], (error, stdout, stderr) => {
+    execFile("bash", [path.join(__dirname, "scripts", `destroy_clusters.sh`), `${process.env.DB}`], (error, stdout, stderr) => {
         if (error) {
             console.error("Error", error.message);
         }
