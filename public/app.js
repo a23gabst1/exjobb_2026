@@ -1,4 +1,27 @@
 /**
+ * Function that connects to an event stream from the server to know which database cluster is configured and ready to be measured
+ */
+(function () {
+    const source = new EventSource('http://localhost:3000/db_events');
+
+    source.addEventListener("message", (event) => {
+        const data = event.data.split(" ");
+        const page1Content = document.getElementById("page_step_0").children;
+
+        data[1] === "mongodb" ?
+            page1Content[1].classList.add("disabled_db_btn")
+            :
+            page1Content[0].classList.add("disabled_db_btn");
+
+        source.close();
+    });
+
+    source.addEventListener("error", (event) => {
+        console.error("Error occured on EventSource", event);
+    });
+})();
+
+/**
  * Function that is responsible for switching pages
  * 
  * @param {number} page 
@@ -129,7 +152,7 @@ async function sendRequest(currentIteration = 0) {
 
         setTimeout(async () => {
             await sendRequest(currentIteration + 1);
-        }, 3000);
+        }, 2000);
     } catch (error) {
         console.error(`Error when sending request to '/${database}' endpoint`, error);
     }
