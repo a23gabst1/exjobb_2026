@@ -5,17 +5,3 @@ services:
     command: mongod --configsvr --replSet cfgrs --port 27017
     ports:
       - 10001:27017
-
-  configs_2:
-    container_name: configs2
-    image: mongo
-    command: mongod --configsvr --replSet cfgrs --port 27017
-    ports:
-      - 10002:27017
-
-  configs_3:
-    container_name: configs3
-    image: mongo
-    command: mongod --configsvr --replSet cfgrs --port 27017
-    ports:
-      - 10003:27017
