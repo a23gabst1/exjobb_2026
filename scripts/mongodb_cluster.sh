@@ -10,10 +10,8 @@ cd ..
 docker compose -f docker/docker-compose-mongo-config.yaml up -d
 
 # Make sures that every service is ready to accept commands
-for service in configs1 configs2 configs3; do
-    until docker exec $service mongosh --eval "db.adminCommand('ping')" &> /dev/null; do
-        sleep 2
-    done
+until docker exec configs1 mongosh --eval "db.adminCommand('ping')" &> /dev/null; do
+    sleep 2
 done
 
 echo "Config Servers are ready"
@@ -25,8 +23,6 @@ rs.initiate({
     configsvr: true,
     members: [
         {_id: 0, host: "configs1:27017"},
-        {_id: 1, host: "configs2:27017"},
-        {_id: 2, host: "configs3:27017"}
     ]
 });
 '
