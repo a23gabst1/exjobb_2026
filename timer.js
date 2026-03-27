@@ -1,4 +1,4 @@
-import { __dirname, numOfDocuments, selectedDatabase } from "./server.js";
+import { __dirname, selectedDatabase } from "./server.js";
 import path from "node:path";
 import fs from "node:fs"
 import convertHrtime from "convert-hrtime";
@@ -20,7 +20,7 @@ function stopTimer(startTime, patientID) {
 // It stores the start clock, stop clock, time difference and patient id 
 function storeResult(trialData) {
     const { startTime, stopTime, deltaTime, patientID } = trialData;
-    const fullPath = path.join(__dirname, "measures", `${numOfDocuments}_${selectedDatabase}.csv`);
+    const fullPath = path.join(__dirname, "measures", `${selectedDatabase}.csv`);
     const csvRow = `${convertTime(startTime)},${convertTime(stopTime)},${convertTime(deltaTime)},${patientID}\n`;
 
     fs.appendFile(fullPath, csvRow, (error) => {
