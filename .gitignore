@@ -143,12 +143,30 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# Testing environment 
 testing/
-lc25000-extracted/
-images/
+
+# The generated data
 data/*.json
+
+# The raw collected measures
 measures/
+
 chunks/
 readme_images/
+
+# Python scripts to visualize the results
 python/
+
+# Filtered csv files
 filtered_measures/
+
+# Ignores every folder and file inside the val folder
+lc25000-extracted/LC25000/lung_split/val/*
+
+# Same as the above but on the train folder
+lc25000-extracted/LC25000/lung_split/train/*
+
+# Make a exception with the folder colon_aca
+# Ignores every folder and files except the colon_aca folder inside train folder
+!lc25000-extracted/LC25000/lung_split/train/colon_aca/
