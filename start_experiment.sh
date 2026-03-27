@@ -1,10 +1,9 @@
 #!/bin/bash
 
-IMAGE_COUNT=$1
-DATABASE=$2
+DATABASE=$1
 
 # Exits the process if one of the necessary arguments are empty
-if [ -z "${IMAGE_COUNT}" ] || [ -z "${DATABASE}" ]; then
+if [ -z "${DATABASE}" ]; then
     echo "Image count or database arguments cannot be empty"
     exit 1
 fi
@@ -19,18 +18,18 @@ cd scripts/
 
 chmod +x ./generate_data.sh ./mongodb_cluster.sh ./couchdb_cluster.sh
 
-./generate_data.sh $IMAGE_COUNT
+./generate_data.sh
 
 # Only one of the databases can run since it goes over the memory and CPU usage limit on higher number of documents on Docker Desktop
 if [ "$DATABASE" = "mongodb" ]; then
     ./mongodb_cluster.sh
 else 
-    ./couchdb_cluster.sh $IMAGE_COUNT
+    ./couchdb_cluster.sh 99
 fi
 
 cd ..
 
-DOC_SIZE=$IMAGE_COUNT DB=$DATABASE node server.js
+DB=$DATABASE node server.js
 
 sleep 3
 
