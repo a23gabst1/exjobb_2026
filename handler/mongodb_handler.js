@@ -1,8 +1,9 @@
 import { MongoClient } from "mongodb";
-import { MONGODB_URI } from "../config/config.js";
 import { startTimer, stopTimer } from "../timer.js"
 
-const client = new MongoClient(`${MONGODB_URI}`);
+const MONGODB_URI = "mongodb://localhost:30000";
+
+const client = new MongoClient(MONGODB_URI);
 
 /**
  * Function that is responsible for returning all images connected to the specific patient via its ID
