@@ -1,4 +1,5 @@
 import express from "express"
+import { PORT } from "./config/config.js"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import { mongoRouter } from "./routes/mongodb_router.js"
@@ -10,6 +11,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
+const docSizes = {
+    "9": "1M",
+    "49": "5M",
+    "99": "10M"
+};
+
+const numOfDocuments = docSizes[process.env.DOC_SIZE];
 let selectedDatabase = null;
 
 // Express middlewares
@@ -33,7 +41,7 @@ app.get("/init_experiment", async (req, res) => {
     try {
         const csvHeader = "old,new,delta,patient_id\n";
         const resultFolder = "measures";
-        const fullPath = path.join(__dirname, resultFolder, `${selectedDatabase}.csv`);
+        const fullPath = path.join(__dirname, resultFolder, `${numOfDocuments}_${selectedDatabase}.csv`);
         await writeFile(fullPath, csvHeader);
 
         return res.status(200).json({
@@ -69,7 +77,6 @@ app.get("/db_events", (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
 });
@@ -107,4 +114,4 @@ process.once("SIGTERM", () => {
     cleanUpNExit("SIGTERM");
 });
 
-export { selectedDatabase, __dirname };
+export { numOfDocuments, selectedDatabase, __dirname };
