@@ -1,9 +1,8 @@
+import { COUCHDB_URI } from "../config/config.js"
 import nano from "nano";
 import { startTimer, stopTimer } from "../timer.js"
 
-const COUCHDB_URI = "http://user:password@localhost:21000";
-
-const client = nano(COUCHDB_URI);
+const client = nano(`${COUCHDB_URI}`);
 
 /**
  * Function that is responsible to returns images related to a specific patient via its id
