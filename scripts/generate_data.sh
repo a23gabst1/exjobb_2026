@@ -1,6 +1,6 @@
 #!/bin/bash
 
-numOfImages=99
+numOfImages=$1
 
 cd ../data
 
