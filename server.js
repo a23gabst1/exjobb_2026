@@ -1,5 +1,4 @@
 import express from "express"
-import { PORT } from "./config/config.js"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import { mongoRouter } from "./routes/mongodb_router.js"
@@ -77,6 +76,7 @@ app.get("/db_events", (req, res) => {
     });
 });
 
+const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
 });
