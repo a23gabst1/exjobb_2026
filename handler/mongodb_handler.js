@@ -22,8 +22,8 @@ async function getPatientImages(req, res) {
         const collection = db.collection("images");
 
         const startTime = startTimer();
-        const patientImages = await collection.find({ patient_id: patient_id }).limit(15).toArray();
-        stopTimer(startTime, patient_id);
+        const patientImages = await collection.find({ patient_id: patient_id }).toArray();
+        stopTimer(startTime, patient_id, patientImages.length);
 
         return res.status(200).json({
             msg: "Successful read",

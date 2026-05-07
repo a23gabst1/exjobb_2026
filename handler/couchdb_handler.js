@@ -21,13 +21,12 @@ async function getPatientImages(req, res) {
             selector: {
                 patient_id: { "$eq": patient_id },
                 content_type: { "$eq": "image/jpeg" }
-            },
-            limit: 15
+            }
         };
 
         const startTime = startTimer();
         const response = await db.find(mangoQuery);
-        stopTimer(startTime, patient_id);
+        stopTimer(startTime, patient_id, response.docs.length);
 
         return res.status(200).json({
             msg: "Successful read!",
