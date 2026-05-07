@@ -1,3 +1,10 @@
+const maxNumOfPatients = {
+    "1": 76020,
+    "5": 385090,
+    "10": 767899
+};
+let docSize = null;
+
 /**
  * Function that connects to an event stream from the server to know which database cluster is configured and ready to be measured
  */
@@ -5,10 +12,12 @@
     const source = new EventSource('http://localhost:3000/db_events');
 
     source.addEventListener("message", (event) => {
-        const data = event.data.split(" ");
+        const data = JSON.parse(event.data);
         const page1Content = document.getElementById("page_step_0").children;
+        console.log(docSize, data);
+        docSize = data.size;
 
-        data[1] === "mongodb" ?
+        data.db === "mongodb" ?
             page1Content[1].classList.add("disabled_db_btn")
             :
             page1Content[0].classList.add("disabled_db_btn");
@@ -44,7 +53,6 @@ function handlePage1Click(event) {
     const element = event.target;
 
     if (!element.classList.contains("mongodb") && !element.classList.contains("couchdb")) {
-        console.log("Nope");
         return;
     }
 
@@ -131,7 +139,7 @@ async function sendRequest(currentIteration = 0) {
     Math.setSeed(currentIteration);
 
     try {
-        const numOfPatients = 100_000;
+        const numOfPatients = maxNumOfPatients[docSize];
         const randomPatient = Math.floor(Math.random() * numOfPatients);
 
         const database = selectedDatabase.toLowerCase();
