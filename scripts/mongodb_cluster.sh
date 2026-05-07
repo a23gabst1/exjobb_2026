@@ -84,7 +84,6 @@ db.images.createIndex(
     {"patient_id": 1, "content_type": 1}
 );
 sh.enableSharding("hospitaldb");
-sh.shardCollection("hospitaldb.patients", {patient_id: "hashed"});
 sh.shardCollection("hospitaldb.images", {patient_id: "hashed"});
 '
 
@@ -99,11 +98,6 @@ db="hospitaldb"
 # Chooses a database (creates it if it does not exist)
 # Chooses which collection it should be loaded into (Same with the database it creates that collection if it does not exist)
 # Lastly --file specifies the location of the data file
-mongoimport \
---uri "$uri" \
---db "$db" \
---collection "patients" \
---file "$(pwd)/data/patients.json"
 
 mongoimport \
 --uri "$uri" \

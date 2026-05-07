@@ -77,10 +77,6 @@ echo "CURRENT PATH: $(pwd)"
 
 cd ../data
 
-# Using the couchimport package to import to couchdb by first navigating to the folder where the data reside
-# Specify the database, the url and the buffer
-cat ./patients.json | couchimport --db $DATABASE --url "http://user:password@localhost:${BASE_PORT}${PRIMARY}" --buffer 10000
-
 # All this below is Parallel writes 
 
 # Based on the size of the file, it will split the file to 300K or 1M lines for each splitted file
