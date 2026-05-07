@@ -11,9 +11,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const docSizes = {
-    "9": "1M",
-    "49": "5M",
-    "99": "10M"
+    "1": "1M",
+    "5": "5M",
+    "10": "10M"
 };
 
 const numOfDocuments = docSizes[process.env.DOC_SIZE];
@@ -38,7 +38,7 @@ app.get("/init_experiment", async (req, res) => {
     selectedDatabase = database;
 
     try {
-        const csvHeader = "old,new,delta,patient_id\n";
+        const csvHeader = "old,new,delta,patient_id,num_of_imgs\n";
         const resultFolder = "measures";
         const fullPath = path.join(__dirname, resultFolder, `${numOfDocuments}_${selectedDatabase}.csv`);
         await writeFile(fullPath, csvHeader);
@@ -67,7 +67,10 @@ app.get("/db_events", (req, res) => {
     });
 
     const intervalID = setInterval(() => {
-        res.write(`data: DB ${process.env.DB}\n\n`);
+        res.write(`data: ${JSON.stringify({
+            db: process.env.DB,
+            size: process.env.DOC_SIZE
+        })}\n\n`);
     }, 100);
 
     req.on("close", () => {
