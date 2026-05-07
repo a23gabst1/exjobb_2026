@@ -22,7 +22,6 @@
   "dependencies": {
     "convert-hrtime": "^5.0.0",
     "couchimport": "^3.0.2",
-    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
     "nano": "^11.0.4"
