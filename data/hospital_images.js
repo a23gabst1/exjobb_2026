@@ -9,10 +9,9 @@ https://pracrand.sourceforge.net/
 https://github.com/LenaSYS/Random-Number-Generator/blob/master/seededrandom.js
 */
 
-import path from "node:path"
+import path, { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url";
-import fs from "node:fs/promises"
-import { createWriteStream } from "node:fs";
+import fs, { createWriteStream } from "node:fs"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,56 +38,110 @@ Math.setSeed = function (seed) {
     for (var i = 0; i < 7; i++) Math.random();
 }
 
-/**
- * Creates the images collection consisted of colon cancer
- * 
- * Each patient get the same amount of images (uniform)
- * 
- * Each image record is stored in .json file to later imported to the databases
- * 
- * It uses a seed to generate pseudorandom sequence of numbers which could be repeated 
- * 
- * Could be improved
- */
-async function createHospitalImages() {
-    //Directory with tons of images of colon cancer
-    const folderPath = path.join(__dirname, "../lc25000-extracted/LC25000/lung_split/train/colon_aca");
-    const numOfPatients = 100_000;
-    const numOfImages = parseInt(process.argv[2]); // 9, 49, 99
-    const imageStream = createWriteStream(path.join(__dirname, "hospital_images.json"));
-    let seedCount = 0;
+const countOfImages = [];
+const imgStorage = [];
 
-    try {
-        const images = await fs.readdir(folderPath);
+(function () {
+    for (let i = 1; i <= 50; i++) {
+        countOfImages.push(i);
+    }
+})();
 
-        //Outer loop - every patient
-        for (let i = 0; i < numOfPatients; i++) {
-            Math.setSeed(seedCount);
+function getRandomNum(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
 
-            //Inner loop - every image for the patient
-            for (let j = 0; j < numOfImages; j++) {
-                const randomIndex = Math.floor(Math.random() * images.length);
-
-                const imageRecord = {
-                    image_id: `I${stringPadding(i)}-${stringPadding(j)}`,
-                    patient_id: `P${stringPadding(i)}`,
-                    img_src: `/images/colon_aca/${images[randomIndex]}`,
-                    disease_type: "colon cancer",
-                    content_type: "image/jpeg"
-                };
-
-                imageStream.write(JSON.stringify(imageRecord) + "\n");
-            }
-            seedCount += 1;
-        }
-
-        imageStream.end();
-    } catch (error) {
-        console.error("Error when creating images for hospital dataset", error);
+function randomImageCount(imgList, distribution) {
+    if (distribution) {
+        let idx = getRandomNum(0, imgList.length);
+        return countOfImages[idx];
+    }
+    else {
+        let idx = getRandomNum(0, imgList.length + 1);
+        idx = getRandomNum(0, idx);
+        return imgList[idx];
     }
 }
 
-await createHospitalImages();
+for (let i = 0; i < 500; i++) {
+    Math.setSeed(i);
+    imgStorage.push(randomImageCount(countOfImages, 0));
+}
+
+/**
+ * Generates the dataset to be imported to the database clusters 
+ * 
+ * It creates either 1M, 5M or 10M documents which are hospital images related to a patient 
+ */
+function generateData() {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    let dataVolume = parseInt(process.argv[2]);
+    let retryCounter = 0;
+    let fileStream = fs.createWriteStream(join(__dirname, "hospital_images.json"));
+    let medicalImgs = fs.readdirSync(join(__dirname, "../lc25000-extracted/LC25000/lung_split/train/colon_aca"));
+
+    const amountOfDocs = {
+        10: 10_000_000,
+        5: 5_000_000,
+        1: 1_000_000
+    };
+
+    let documentWatcher = amountOfDocs[dataVolume];
+
+    for (let i = 0; documentWatcher > 0; i++) {
+        retryCounter = 0;
+        Math.setSeed(i);
+
+        while (retryCounter < 5) {
+            const idx = randomImageCount(countOfImages, 0);
+            let diff = documentWatcher - idx;
+
+            if (diff < 0 && retryCounter != 4) {
+                retryCounter += 1;
+                continue;
+            }
+            else if (diff < 0 && retryCounter === 4) {
+                const fixedIdx = 1;
+                for (let j = 0; j < fixedIdx; j++) {
+                    const randomIdx = Math.floor(Math.random() * medicalImgs.length);
+
+                    const imgRecord = {
+                        img_id: `${stringPadding(i)}-${stringPadding(j)}`,
+                        patient_id: `P${stringPadding(i)}`,
+                        img_src: `/images/colon_aca/${medicalImgs[randomIdx]}`,
+                        disease_type: "colon cancer",
+                        content_type: "image/jpeg"
+                    };
+
+                    fileStream.write(JSON.stringify(imgRecord) + "\n");
+                }
+                documentWatcher -= fixedIdx;
+                break;
+            }
+            else {
+                for (let j = 0; j < idx; j++) {
+                    const randomIdx = Math.floor(Math.random() * medicalImgs.length);
+                    const imgRecord = {
+                        img_id: `${stringPadding(i)}-${stringPadding(j)}`,
+                        patient_id: `P${stringPadding(i)}`,
+                        img_src: `/images/colon_aca/${medicalImgs[randomIdx]}`,
+                        disease_type: "colon cancer",
+                        content_type: "image/jpeg"
+                    };
+
+                    fileStream.write(JSON.stringify(imgRecord) + "\n");
+                }
+                documentWatcher -= idx;
+                break;
+            }
+        }
+    }
+
+    fileStream.close();
+}
+
+generateData();
 
 /**
  * Adds a 0 in front of every number from 1-9
