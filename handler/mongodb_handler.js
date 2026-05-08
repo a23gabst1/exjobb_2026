@@ -25,6 +25,8 @@ async function getPatientImages(req, res) {
         const patientImages = await collection.find({ patient_id: patient_id }).toArray();
         stopTimer(startTime, patient_id, patientImages.length);
 
+        res.setHeader("Cache-Control", "no-store");
+
         return res.status(200).json({
             msg: "Successful read",
             images: patientImages
