@@ -158,9 +158,11 @@ async function sendRequest(currentIteration = 0) {
 
         createView(data, patientID);
 
-        setTimeout(async () => {
-            await sendRequest(currentIteration + 1);
-        }, 2000);
+        // setTimeout(async () => {
+        // await sendRequest(currentIteration + 1);
+        // }, 2000);
+
+        await sendRequest(currentIteration + 1);
     } catch (error) {
         console.error(`Error when sending request to '/${database}' endpoint`, error);
     }
