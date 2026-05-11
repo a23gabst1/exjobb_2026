@@ -21,7 +21,8 @@ async function getPatientImages(req, res) {
             selector: {
                 patient_id: { "$eq": patient_id },
                 content_type: { "$eq": "image/jpeg" }
-            }
+            },
+            limit: 50
         };
 
         const startTime = startTimer();
