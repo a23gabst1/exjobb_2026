@@ -2,6 +2,7 @@
 
 IMAGE_COUNT=$1
 DATABASE=$2
+DEVELOPMENT=$3
 
 # Exits the process if one of the necessary arguments are empty
 if [ -z "${IMAGE_COUNT}" ] || [ -z "${DATABASE}" ]; then
@@ -30,7 +31,11 @@ fi
 
 cd ..
 
-DOC_SIZE=$IMAGE_COUNT DB=$DATABASE node server.js
+if [ "$DEVELOPMENT" == "dev"]; then
+    DOC_SIZE=$IMAGE_COUNT DB=$DATABASE npm run dev
+else
+    DOC_SIZE=$IMAGE_COUNT DB=$DATABASE npm run start
+fi
 
 sleep 3
 
