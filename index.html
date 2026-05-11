@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script defer src="/public/seeded_random.js"></script>
+    <script defer src="/public/patient_ids.js"></script>
     <script defer src="/public/app.js"></script>
     <link rel="stylesheet" href="/public/style.css">
     <title>Exjobb 2026</title>
@@ -21,6 +22,10 @@
             <div id="page_step_1" class="page_step">
                 <label for="trials_input">Number of trials</label>
                 <input type="number" id="trials_input">
+                <div class="img_btn_wrapper">
+                    <button class="img_l" data-img_type="L">Fler Bilder</button>
+                    <button class="img_s" data-img_type="S">Få Bilder</button>
+                </div>
                 <input type="button" value="Start">
             </div>
 
