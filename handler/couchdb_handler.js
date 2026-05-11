@@ -29,6 +29,8 @@ async function getPatientImages(req, res) {
         const response = await db.find(mangoQuery);
         stopTimer(startTime, patient_id, response.docs.length);
 
+        res.setHeader("Cache-Control", "no-store");
+
         return res.status(200).json({
             msg: "Successful read!",
             images: response.docs
